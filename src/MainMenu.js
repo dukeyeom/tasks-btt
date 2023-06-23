@@ -8,16 +8,21 @@ import {
   MenuGroup,
   MenuOptionGroup,
   MenuDivider,
+  useDisclosure
 } from '@chakra-ui/react';
 import {
   MdOutlineMenu,
   MdOutlineRefresh,
   MdOutlineDarkMode,
-  MdOutlineSettings
+  MdOutlineSettings,
+  MdOutlineVolumeOff
 } from 'react-icons/md';
+import { SettingsModal } from './SettingsModal.js'
 
 export const MainMenu = () => {
-  return <Menu>
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  return (<>
+    <Menu>
     <MenuButton 
       as={IconButton}
       color="blackAlpha.600"
@@ -28,17 +33,30 @@ export const MainMenu = () => {
       size="sm"
     />
     <MenuList>
-      <MenuItem icon={<MdOutlineRefresh/>}>
+      <MenuItem icon={<MdOutlineRefresh/>}
+
+      >
         Refresh
       </MenuItem>
-      <MenuItem icon={<MdOutlineDarkMode/>}>
+      <MenuItem icon={<MdOutlineVolumeOff/>}
+      
+      >
+        Mute all sounds
+      </MenuItem>
+      <MenuItem icon={<MdOutlineDarkMode/>}
+      
+      >
         Dark mode
       </MenuItem>
-      <MenuItem icon={<MdOutlineSettings/>}>
+      <MenuItem icon={<MdOutlineSettings/>}
+        onClick={() => onOpen()}
+      >
         Settings
       </MenuItem>
     </MenuList>
-  </Menu>
+    </Menu>
+    <SettingsModal isOpen={isOpen} onClose={onClose} />
+  </>);
 };
 
 export default MainMenu;

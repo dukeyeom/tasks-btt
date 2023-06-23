@@ -19,16 +19,24 @@ import {
   Switch,
   Box,
   Heading,
-  Text
+  Text,
+  Spacer
 } from '@chakra-ui/react'
 import { MdOutlineTimer } from 'react-icons/md';
 
 const TimeInput = ({label, defaultValue}) => {
   return (
     <Box
-
+      position="relative"
+      width="45%"
     >
-    <Heading size="md">{label}</Heading>
+    <Heading
+      size="md"
+      fontWeight="500"
+      marginBottom="6px"
+    >
+      {label}
+    </Heading>
     <NumberInput
       allowMouseWheel
       defaultValue={defaultValue}
@@ -62,17 +70,28 @@ export const TimerPopover = () => {
         />
       </PopoverTrigger>
       <PopoverContent
+        position="relative"
+        left="-25px"
         w="280px"
-        margin="10px"
       >
         <PopoverArrow />
-        <PopoverCloseButton />
-        <PopoverHeader>
-          Enable timer
+        <PopoverHeader
+          fontSize="xl"
+          fontWeight="700"
+          display="flex"
+          alignItems="center"
+        >
+          Pomodoro Timer
+          <Spacer />
           <Switch />
         </PopoverHeader>
-        <PopoverBody>
-          <Flex>
+        <PopoverBody
+          padding="7px 5px 10px 5px"
+        >
+          <Flex
+            justifyContent="space-around"
+            paddingBottom="11px"
+          >
             <TimeInput
               label="Work"
               defaultValue={25}
@@ -82,6 +101,12 @@ export const TimerPopover = () => {
               defaultValue={5}
             />
           </Flex>
+          <hr />
+          <Text
+            padding="3px"
+          >
+            Completed 0 pomodoros today
+          </Text>
         </PopoverBody>
       </PopoverContent>
     </Popover>
