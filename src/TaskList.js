@@ -15,50 +15,63 @@ import { Draggable } from '@hello-pangea/dnd';
 
 const TaskCard = ({task, index}) => {
   return (
-  <Draggable
-    draggableId={String(task.id)}
-    index={index}
-  >
-    {(provided) =>
-    <Card
-      {...provided.draggableProps}
-      {...provided.dragHandleProps}
-      innerRef={provided.innerRef}
-      width="96%"
-      fontSize="17px"
-      fontWeight="500"
-      boxShadow="rgba(0, 0, 0, 0.15) 0px 2px 8px"
+    <Draggable
+      key={task.id}
+      draggableId={String(task.id)}
+      index={index}
     >
-      <CardBody
-        padding="5px 8px 5px 8px"
-      >
-        <HStack >
-        <Box minWidth="21px">
-        <MdOutlineRadioButtonUnchecked
-          fontSize="21px"
-          color="gray"
-        /></Box>
-        <Text>{task.content}</Text>
-        </HStack>
-      </CardBody>
-    </Card>
-    }
-  </Draggable>
+      {(provided) => 
+        <div
+          ref={provided.innerRef}
+          {...provided.draggableProps}
+          {...provided.dragHandleProps}
+          style={{
+            display: "flex",
+            width: "96%",
+            margin: "2%",
+            padding: "3px",
+            fontSize: "17px",
+            fontWeight: "500",
+            boxShadow: "rgba(0, 0, 0, 0.15) 0px 2px 8px",
+            backgroundColor: "white",
+            borderRadius: "7px",
+            ...provided.draggableProps.style
+          }}
+        >
+          <HStack >
+            <Box minWidth="21px">
+            <MdOutlineRadioButtonUnchecked
+              fontSize="21px"
+              color="gray"
+            /></Box>
+            <Text>{task.content}</Text>
+          </HStack>
+        </div>
+      }
+    </Draggable>
   );
 };
 
-export const TaskList = ({tasks}) => {
+export const TaskList = ({tasks, provided}) => {
   return (
-  <VStack
-    position="relative"
-    height="88%"
-    overflowY="scroll"
-    borderRadius="13px"
+  <div
+    ref={provided.innerRef}
+    {...provided.droppableProps}
+    style={{
+      position: "relative",
+      height: "88.5%",
+      overflowY: "scroll",
+      borderRadius: "13px",
+      ...provided.droppableProps.style,
+    }}
   > 
     {tasks.map((task, index) =>
-      <TaskCard key={task.id} task={task} index={index} />
+      index === 0
+      ? null
+      : <TaskCard key={task.id} task={task} index={index} />
     )}
-  </VStack>
+    {provided.placeholder}
+  </div>
   );
 };
 

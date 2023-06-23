@@ -1,4 +1,4 @@
-import { IconButton, Flex, Stack, Spacer, Switch } from '@chakra-ui/react';
+import { IconButton, Flex, Stack, Spacer, Switch, CircularProgress } from '@chakra-ui/react';
 import { MdOutlineMenu } from 'react-icons/md';
 import { TimerPopover } from './TimerPopover.js';
 import { MainMenu } from './MainMenu.js'
@@ -22,7 +22,10 @@ export const NavBar = () => {
         alignItems="center"
         paddingLeft="11px"
       >
-        
+        {/* <CircularProgress
+          isIndeterminate
+          size="25px"
+        /> */}
       </Stack>
       <Stack
         direction="row"
