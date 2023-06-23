@@ -15,7 +15,18 @@ export const TaskListBody = () => {
 
   const onDragEnd = result => {
     console.log(result);
-    
+    if (result.destination === null)
+      return;
+    if (result.source.index === result.destination.index)
+      return;
+    const movedTask = tasks.find(task => task.id === +result.draggableId);
+    let newTasks = tasks.filter(task => task.id !== +result.draggableId);
+    newTasks = [
+      ...newTasks.slice(0, result.destination.index),
+      movedTask,
+      ...newTasks.slice(result.destination.index)
+    ];
+    setTasks(newTasks);
   };
 
   return (

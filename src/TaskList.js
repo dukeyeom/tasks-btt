@@ -59,7 +59,7 @@ export const TaskList = ({tasks, provided}) => {
     {...provided.droppableProps}
     style={{
       position: "relative",
-      height: "88.5%",
+      height: "89.5%",
       overflowY: "scroll",
       borderRadius: "13px",
       ...provided.droppableProps.style,

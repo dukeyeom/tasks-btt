@@ -43,7 +43,7 @@ const VirtualTaskWidget = ({task}) => {
     <Draggable
       key={task.id}
       draggableId={String(task.id)}
-      index={1}
+      index={0}
     >
       {(provided) =>
         <div
@@ -94,8 +94,8 @@ export const VirtualTouchBar = ({firstTask, provided}) => {
         width: "full",
         height: "40px",
         backgroundColor: "black",
-        borderRadius: "7px",
-        margin: "5px 5px 0 5px",
+        borderRadius: "7px 0 0 7px",
+        margin: "5px 0 0 5px",
         padding: "15px 0 15px 15px",
         overflow: "hidden"
         // ...provided.droppableProps.style,
