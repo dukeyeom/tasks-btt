@@ -6,13 +6,16 @@ import {
 import { VirtualTouchBar } from './VirtualTouchBar.js';
 import { TaskList } from './TaskList.js';
 import { DragDropContext, Droppable } from "@hello-pangea/dnd";
+import { useState } from "react";
 
 const testTasks = require('./testTasks.json');
 
 export const TaskListBody = () => {
+  const [tasks, setTasks] = useState(testTasks);
 
   const onDragEnd = result => {
-    return null;
+    console.log(result);
+    
   };
 
   return (
@@ -25,18 +28,23 @@ export const TaskListBody = () => {
       borderRadius="0 0 15px 15px"
       overflow="hidden"
     >
-      <Droppable droppableId="touchbar">
-        {() => <VirtualTouchBar />}
+      <Droppable
+        droppableId="touchbar"
+        direction="horizontal"
+      >
+        {(provided) =>
+         <VirtualTouchBar
+          firstTask={tasks[0]}
+          provided={provided}
+         />
+        }
       </Droppable>
       <Droppable droppableId="list">
         {(provided) =>
           <TaskList
-            tasks={testTasks}
-            ref={provided.innerRef}
-            {...provided.droppableProps}
-          >
-            {provided.placeholder}
-          </TaskList>
+            tasks={tasks}
+            provided={provided}
+          />
         }
       </Droppable>
     </Box>
