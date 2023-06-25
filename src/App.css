@@ -7,6 +7,27 @@
 	}
 }
 
+@keyframes fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes shade-in {
+  from {
+    color: black;
+  }
+  to {
+    color: gray;
+  }
+}
+/* The Box thats this ruleset styles contains the entire app */
+/* The dimensions of the actual WebView are slightly larger than this Box! */
+/* The only reason I did this is to add a transparent margin for */
+/* that sexy box shadow. */
 .appWrapper {
   position: fixed;
   opacity: 0;
@@ -19,6 +40,12 @@
   user-select: none;
 
 }
+
 .innerVirtualTouchBar::-webkit-scrollbar {
   display: none;
+}
+
+.taskFadeout {
+  animation: fade-out 0.25s ease-out 2s, shade-in 0.12s linear 0s;
+  color: gray;
 }

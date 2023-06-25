@@ -1,9 +1,8 @@
 import { IconButton, Flex, Stack, Spacer, Switch, CircularProgress } from '@chakra-ui/react';
-import { MdOutlineMenu } from 'react-icons/md';
 import { TimerPopover } from './TimerPopover.js';
 import { MainMenu } from './MainMenu.js'
 
-export const NavBar = () => {
+export const NavBar = ({timer}) => {
   return (<>
     <Flex
       as="header"
@@ -32,7 +31,7 @@ export const NavBar = () => {
         display="flex"
         alignItems="center"
       >
-        <TimerPopover />
+        <TimerPopover timerObject={timer} />
         <MainMenu />
         <Spacer w="2px" />
       </Stack>

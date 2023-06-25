@@ -20,17 +20,54 @@ import {
   SliderFilledTrack,
   SliderThumb,
   SliderMark,
+  Divider,
 } from '@chakra-ui/react';
+import {
+  getBTTVariable,
+  setBTTVariable,
+  changeTimerVariable,
+  playSound
+} from './apiService';
 
-import { QuestionIcon } from'@chakra-ui/icons';
+import { QuestionIcon } from '@chakra-ui/icons';
+import { useEffect, useState } from 'react';
 
-const SoundSelect = () => {
-  return <Select>
-    <option value="">Complete</option>
-    <option value="">Complete</option>
-    <option value="">Complete</option>
-    <option value="">Complete</option>
-    <option value="">Complete</option>
+const SoundSelect = ({type}) => {
+  const [selection, setSelection] = useState(null);
+  useEffect(() => {
+    if (type.includes('task'))
+      getBTTVariable(`${type}Sound`)
+        .then(result => setSelection(result))
+    else
+      getBTTVariable(`timer`)
+        .then(result => setSelection(result[`${type}Sound`]))
+  }, []);
+  return <Select
+    value={selection}
+    onChange={event => {
+      playSound(event.target.value);
+      if (type.includes('task'))
+        setBTTVariable(`${type}Sound`, event.target.value)
+      else
+        changeTimerVariable(`${type}Sound`, event.target.value)
+      setSelection(event.target.value);
+    }}
+  >
+    <option value="Airplane">Airplane</option>
+    <option value="BassDrop">Bass Drop</option>
+    <option value="Complete">Complete</option>
+    <option value="Decide">Decide</option>
+    <option value="Ding">Ding</option>
+    <option value="Done">Done</option>
+    <option value="Marimba">Marimba</option>
+    <option value="Pop">Pop</option>
+    <option value="Ringtone">Ringtone</option>
+    <option value="RisingChord">Rising Chord</option>
+    <option value="Select">Select</option>
+    <option value="Start">Start</option>
+    <option value="SwipeCard">Swipe Card</option>
+    <Divider />
+    <option value="None">None</option>
   </Select>;
 }
 
@@ -101,11 +138,17 @@ export const SettingsModal = ({isOpen, onClose}) => {
               <Heading size="xs">Change Pomodaro count emoji</Heading>
               <Heading size="xs">Day starts at</Heading>
               <Heading size="xs">Timer start sound</Heading>
-              <SoundSelect />
+              <SoundSelect
+                type="start"
+              />
               <Heading size="xs">Work interval completion sound</Heading>
-              <SoundSelect />
+              <SoundSelect
+                type="work"
+              />
               <Heading size="xs">Rest interval completion sound</Heading>
-              <SoundSelect />
+              <SoundSelect
+                type="rest"
+              />
               <hr />
               <Heading size="md">Task widget</Heading>
               <HStack>
@@ -121,7 +164,9 @@ export const SettingsModal = ({isOpen, onClose}) => {
                 <SliderThumb />
               </Slider>
               <Heading size="xs">Task completion sound</Heading>
-              <SoundSelect />
+              <SoundSelect
+                type="taskComplete"
+              />
               <hr />
               <Heading size="md">App</Heading>
               <Heading size="xs">Set color theme</Heading>

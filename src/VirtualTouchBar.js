@@ -1,16 +1,55 @@
-import { Center, Flex, Spacer, Text } from "@chakra-ui/react";
+import { Center, Flex, IconButton, Spacer, Text } from "@chakra-ui/react";
 import { Draggable } from "@hello-pangea/dnd";
 import {
   MdOutlineTimer,
+  MdOutlinePause,
   MdOutlineRadioButtonChecked,
-  MdOutlineRadioButtonUnchecked
+  MdOutlineRadioButtonUnchecked,
 } from "react-icons/md";
+import { TaskBody } from './TaskBody';
+import { timerService } from './timerService.js';
+import { getBTTVariable } from "./apiService";
+import { useEffect, useRef, useState } from "react";
 
-const VirtualTimerWidget = () => {
+
+const VirtualTimerWidget = ({timer}) => {
+  const timerRef = useRef(null);
+  const handleMouseDown = () => {
+    timerRef.current = setTimeout(() => {
+      console.log('Click and hold event triggered');
+      setHandleClick(null);
+      setTimeout(() => {
+        setHandleClick(() => timerService.handleTimerTapped);
+      }, 1000)
+      timerService.handleTimerHeld();
+    }, 1500); // Adjust the duration for how long the click needs to be held
+  }
+  const handleMouseUp = () => {
+    clearTimeout(timerRef.current);
+  }
+
+  const [timerObj, setTimerObj] = useState(timer);
+  const [handleClick, setHandleClick] = useState(() => timerService.handleTimerTapped);
+  const timerChangeHandler = (event) => {
+    if (event.detail.name === 'TBT_timer') {
+      getBTTVariable('timer')
+        .then(result => setTimerObj(result))
+    }
+  }
+  useEffect(() => {
+    window.addEventListener('bttVarChanged', timerChangeHandler);
+    return () => {
+      window.removeEventListener('bttVarChanged', timerChangeHandler)
+    }
+  }, [])
+
   return (
     <Flex
+      onClick={handleClick}
+      onMouseDown={handleMouseDown}
+      onMouseUp={handleMouseUp}
       alignItems="center"
-      backgroundColor="red"
+      backgroundColor={timerObj.onWorkInterval ? "red" : "dodgerblue"}
       height="30px"
       borderRadius="5px"
       padding="7px"
@@ -19,10 +58,12 @@ const VirtualTimerWidget = () => {
       fontWeight="600"
       cursor="pointer"
     >
-      <Center>
-        <MdOutlineTimer
-          fontSize="23px"
-        />
+      <Center fontSize="23px">
+        {
+          timerObj.isPaused
+            ? <MdOutlinePause/>
+            : <MdOutlineTimer/>
+        }
       </Center>
       <Spacer
         width="5px"
@@ -32,13 +73,13 @@ const VirtualTimerWidget = () => {
         minWidth="max"
         width="max"
       >
-        25 min
+        {timerObj.content}
       </Text>
     </Flex>
   );
 };
 
-const VirtualTaskWidget = ({task}) => {
+const VirtualTaskWidget = ({task, completeTask, editTask}) => {
   return (
     <Draggable
       key={task.id}
@@ -64,9 +105,20 @@ const VirtualTaskWidget = ({task}) => {
             ...provided.draggableProps.style
           }}
         >
-          <Center>
-            <MdOutlineRadioButtonUnchecked
-              fontSize="21px"
+          <TaskBody
+            task={task}
+            editTask={editTask}
+            completeTask={completeTask}
+          />
+          {/* <Center>
+            <IconButton
+              borderRadius="15px"
+              variant="ghost"
+              size="xs"
+              icon={<MdOutlineRadioButtonUnchecked
+                fontSize="21px"
+                color="white"
+              />}
             />
           </Center>
           <Spacer
@@ -74,14 +126,14 @@ const VirtualTaskWidget = ({task}) => {
           />
           <Text>
             {task.content}
-          </Text>
+          </Text> */}
         </div>
       }
     </Draggable>
   );
 };
 
-export const VirtualTouchBar = ({firstTask, provided}) => {
+export const VirtualTouchBar = ({timer, firstTask, editTask, completeTask, provided}) => {
   return (
     <div
       ref={provided.innerRef}
@@ -105,13 +157,22 @@ export const VirtualTouchBar = ({firstTask, provided}) => {
         className="innerVirtualTouchBar"
         gap="5px"
         width="max"
-        overflow="scroll"
+        overflowX="scroll"
+        overflowY="hidden"
         paddingRight="10px"
       >
-        <VirtualTimerWidget />
-        <VirtualTaskWidget
-          task={firstTask}
+        <VirtualTimerWidget
+          timer={timer}
         />
+        {
+          firstTask
+          ? <VirtualTaskWidget
+              completeTask={completeTask}
+              editTask={editTask}
+              task={firstTask}
+            />
+          : null
+        }
       {provided.placeholder}
       </Flex>
     </div>

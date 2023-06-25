@@ -15,7 +15,8 @@ import {
   MdOutlineRefresh,
   MdOutlineDarkMode,
   MdOutlineSettings,
-  MdOutlineVolumeOff
+  MdOutlineVolumeOff,
+  MdOutlineExitToApp
 } from 'react-icons/md';
 import { SettingsModal } from './SettingsModal.js'
 
@@ -52,6 +53,12 @@ export const MainMenu = () => {
         onClick={() => onOpen()}
       >
         Settings
+      </MenuItem>
+      <MenuDivider />
+      <MenuItem icon={<MdOutlineExitToApp/>}
+        onClick={() => onOpen()}
+      >
+        Exit
       </MenuItem>
     </MenuList>
     </Menu>

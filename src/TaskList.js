@@ -1,19 +1,27 @@
 import {
-  Card,
-  CardBody,
   HStack,
-  VStack,
+  Button,
+  IconButton,
+  Editable,
+  EditableInput,
+  EditablePreview,
+  useEditableControls,
+  Input,
   Text,
-  Spacer,
-  Box
 } from '@chakra-ui/react';
 import {
+  MdOutlineAdd,
+  MdOutlineEdit,
   MdOutlineRadioButtonChecked,
   MdOutlineRadioButtonUnchecked
 } from "react-icons/md";
 import { Draggable } from '@hello-pangea/dnd';
+import { useState, useEffect } from 'react';
+import { createRipples } from 'react-ripples';
+import './App.css';
+import { TaskBody } from './TaskBody.js';
 
-const TaskCard = ({task, index}) => {
+const TaskCard = ({task, editTask, completeTask, index}) => {
   return (
     <Draggable
       key={task.id}
@@ -22,6 +30,8 @@ const TaskCard = ({task, index}) => {
     >
       {(provided) => 
         <div
+          className={task.isCompleted ? "taskFadeout" : null}
+          onContextMenu={() => false}
           ref={provided.innerRef}
           {...provided.draggableProps}
           {...provided.dragHandleProps}
@@ -29,30 +39,44 @@ const TaskCard = ({task, index}) => {
             display: "flex",
             width: "96%",
             margin: "2%",
-            padding: "3px",
+            padding: "5px",
             fontSize: "17px",
             fontWeight: "500",
             boxShadow: "rgba(0, 0, 0, 0.15) 0px 2px 8px",
             backgroundColor: "white",
             borderRadius: "7px",
+            overflow: "hidden",
             ...provided.draggableProps.style
           }}
         >
-          <HStack >
-            <Box minWidth="21px">
-            <MdOutlineRadioButtonUnchecked
-              fontSize="21px"
-              color="gray"
-            /></Box>
-            <Text>{task.content}</Text>
-          </HStack>
+          <TaskBody
+            task={task}
+            editTask={editTask}
+            completeTask={completeTask}
+          />
         </div>
       }
     </Draggable>
   );
 };
 
-export const TaskList = ({tasks, provided}) => {
+const NewTaskButton = ({addTask}) => {
+  return (
+    <Button
+      onClick={() => addTask()}
+      leftIcon={<MdOutlineAdd fontSize="25px" />}
+      margin="5px"
+      size="sm"
+      width="290px"
+      fontSize="15px"
+      variant="outline"
+    >
+      New Task
+    </Button>
+  );
+};
+
+export const TaskList = ({tasks, editTask, completeTask, addTask, provided}) => {
   return (
   <div
     ref={provided.innerRef}
@@ -60,6 +84,7 @@ export const TaskList = ({tasks, provided}) => {
     style={{
       position: "relative",
       height: "89.5%",
+      overflowX: "hidden",
       overflowY: "scroll",
       borderRadius: "13px",
       ...provided.droppableProps.style,
@@ -68,9 +93,18 @@ export const TaskList = ({tasks, provided}) => {
     {tasks.map((task, index) =>
       index === 0
       ? null
-      : <TaskCard key={task.id} task={task} index={index} />
+      : <TaskCard
+          key={task.id}
+          index={index}
+          task={task}
+          editTask={editTask}
+          completeTask={completeTask}
+        />
     )}
     {provided.placeholder}
+    <NewTaskButton
+      addTask={addTask}
+    />
   </div>
   );
 };
