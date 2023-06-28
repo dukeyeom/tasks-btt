@@ -22,6 +22,7 @@ export const initializeBTT = async () => {
     
     const timer = {
       content: 'Start work',
+      icon: 'timer',
       enabled: true,
       isPaused: false,
       isStarted: false,
@@ -30,15 +31,16 @@ export const initializeBTT = async () => {
       restLength: 5,
       secsRemaining: 1500,
       format: 'mm:ss',
-      workSound: 'Airplane',
-      restSound: 'RisingChord',
-      startSound: 'Airplane',
+      workSound: 'Start',
+      restSound: 'Complete',
+      startSound: 'Ding',
       count: 0,
       currentDay: (new Date()).getDate(),
       emoji: '🍅'
     }
     setBTTVariable('timer', timer);
     setBTTVariable('taskCompleteSound', 'Done');
+    setBTTVariable('appIsMuted', false);
 
     setBTTVariable('cachedTasks', [{content: '', id: -1}])
 

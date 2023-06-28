@@ -4,8 +4,7 @@ import { TaskListBody } from "./TaskListBody.js";
 import { initializeBTT } from "./initializeBTT.js";
 import { getBTTVariable } from "./apiService.js";
 import './App.css';
-import { timerWidgetEventHandler } from "./timerService.js";
-import { taskWidgetEventHandler } from "./taskService.js";
+import { timerWidgetEventHandler, restartTimer } from "./timerService.js";
 import { useEffect } from "react";
 
 // Add buffer time upon launching WebView to give BTT time
@@ -21,7 +20,7 @@ const timer = await getBTTVariable('timer');
 // can only find these functions in inline scripts
 const script = document.createElement('script');
 script.innerHTML = `
-  function BTTWindowWillBecomeVisible() {
+  function BTTInitialize() {
     window.dispatchEvent(new CustomEvent('windowRevealed'));
   }
   function BTTWillCloseWindow() {
@@ -32,19 +31,13 @@ script.innerHTML = `
   }
   async function BTTNotification(note) {
     let data = JSON.parse(note);
-    // console.log(data);
     window.dispatchEvent(new CustomEvent('bttVarChanged', {
       detail: data
     }));
   }
 `;
 document.head.appendChild(script);
-// window.addEventListener('windowRevealed', () => {
-//   // console.log('WebView revealed');
-// });
-// window.addEventListener('bttVarChanged', (event) => {
-//   console.log(event.detail);
-// });
+window.addEventListener('bttVarChanged', timerWidgetEventHandler);
 
 document.body.style.overflow = "hidden";
 const theme = extendTheme({
@@ -61,25 +54,19 @@ const theme = extendTheme({
   },
 });
 
+await restartTimer(timer);
+
 const windowRevealedHandler = async () => {
+  console.log('firing windowRevealedHandler');
   const timer = await getBTTVariable('timer');
+  restartTimer(timer);
   const currentDay = new Date().getDate();
   if (currentDay !== timer.currentDay)
     timer.count = 0;
 };
+window.addEventListener('windowRevealed', windowRevealedHandler);
 
 const App = () => {
-  useEffect(() => {
-    window.addEventListener('windowRevealed', windowRevealedHandler);
-    window.addEventListener('bttVarChanged', timerWidgetEventHandler);
-    window.addEventListener('bttVarChanged', taskWidgetEventHandler);
-    return () => {
-      window.removeEventListener('windowRevealed', windowRevealedHandler);
-      window.removeEventListener('bttVarChanged', timerWidgetEventHandler);
-    window.addEventListener('bttVarChanged', taskWidgetEventHandler);
-    }
-  }, [])
-
   return (
     <ChakraProvider theme={theme}>
     <Box

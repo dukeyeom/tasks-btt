@@ -46,14 +46,13 @@ const api = new TodoistApi(
 //      appMuted
 //      appInitialized
 //      appPathToPresetFolder
-export const setBTTVariable = (varName, value) => {
-  (async () => 
-    await window.callBTT('set_persistent_string_variable', {
-      variable_name: `TBT_${varName}`,
-      to: JSON.stringify(value)
-      }
-    )
-  )();
+export const setBTTVariable = async (varName, value) => {
+  // console.log(`setting BTT ${varName}`, value)
+  await window.callBTT('set_persistent_string_variable', {
+    variable_name: `TBT_${varName}`,
+    to: JSON.stringify(value)
+    }
+  )
 };
 
 export const getBTTVariable = async (varName) => {
@@ -66,12 +65,6 @@ export const refreshTouchBar = () => {
 
 };
 
-export const changeTaskWidgetText = (text) => {
-  window.callBTT('update_trigger', {
-    uuid: '045B775D-C4A8-46D6-8574-EBF3C5C2BD96',
-    json: JSON.stringify({'BTTTouchBarButtonName': text})
-  });
-};
 
 
 
@@ -81,11 +74,14 @@ export const changeTimerVariable = async (key, newValue) => {
     ...oldTimer,
     [key]: newValue
   };
+  // console.log(oldTimer, newTimer);
   setBTTVariable('timer', newTimer);
   return newTimer;
 }
 
 export const playSound = async (sound) => {
+  if (await getBTTVariable('appIsMuted'))
+    return;
   const filePath = `${await getBTTVariable('appPathToPresetFolder')}/sounds/${sound}.mp3`
   let shellScript = `afplay "${filePath}"`;
 	let shellScriptWrapper = {

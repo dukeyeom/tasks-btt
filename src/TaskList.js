@@ -21,7 +21,7 @@ import { createRipples } from 'react-ripples';
 import './App.css';
 import { TaskBody } from './TaskBody.js';
 
-const TaskCard = ({task, editTask, completeTask, index}) => {
+const TaskCard = ({task, addTask, editTask, completeTask, index}) => {
   return (
     <Draggable
       key={task.id}
@@ -51,6 +51,7 @@ const TaskCard = ({task, editTask, completeTask, index}) => {
         >
           <TaskBody
             task={task}
+            addTask={addTask}
             editTask={editTask}
             completeTask={completeTask}
           />
@@ -76,7 +77,7 @@ const NewTaskButton = ({addTask}) => {
   );
 };
 
-export const TaskList = ({tasks, editTask, completeTask, addTask, provided}) => {
+export const TaskList = ({tasks, addTask, editTask, completeTask, provided}) => {
   return (
   <div
     ref={provided.innerRef}
@@ -97,6 +98,7 @@ export const TaskList = ({tasks, editTask, completeTask, addTask, provided}) => 
           key={task.id}
           index={index}
           task={task}
+          addTask={addTask}
           editTask={editTask}
           completeTask={completeTask}
         />

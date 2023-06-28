@@ -32,7 +32,8 @@ const TimeInput = ({timer, label, defaultValue}) => {
   const handleChange = (num) => setMin(num);
 
   useEffect(() => {
-    setBTTVariable('timer', {...timer, [interval]: min});
+    console.log(`Setting ${interval} to ${min}`)
+    changeTimer(interval, min);
   }, [min])
 
   return (

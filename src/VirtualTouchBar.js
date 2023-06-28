@@ -30,18 +30,18 @@ const VirtualTimerWidget = ({timer}) => {
 
   const [timerObj, setTimerObj] = useState(timer);
   const [handleClick, setHandleClick] = useState(() => timerService.handleTimerTapped);
-  const timerChangeHandler = (event) => {
-    if (event.detail.name === 'TBT_timer') {
-      getBTTVariable('timer')
-        .then(result => setTimerObj(result))
-    }
-  }
-  useEffect(() => {
-    window.addEventListener('bttVarChanged', timerChangeHandler);
-    return () => {
-      window.removeEventListener('bttVarChanged', timerChangeHandler)
-    }
-  }, [])
+  // const timerChangeHandler = (event) => {
+  //   if (event.detail.name === 'TBT_timer') {
+  //     getBTTVariable('timer')
+  //       .then(result => setTimerObj(result))
+  //   }
+  // }
+  // useEffect(() => {
+  //   window.addEventListener('bttVarChanged', timerChangeHandler);
+  //   return () => {
+  //     window.removeEventListener('bttVarChanged', timerChangeHandler)
+  //   }
+  // }, [])
 
   return (
     <Flex
@@ -80,6 +80,18 @@ const VirtualTimerWidget = ({timer}) => {
 };
 
 const VirtualTaskWidget = ({task, completeTask, editTask}) => {
+  if (task.isGhost)
+    return (
+      <Text
+        whiteSpace="nowrap"
+        paddingLeft="10px"
+        color="gray"
+        fontWeight="600"
+      >
+        All tasks completed
+      </Text>
+    )
+
   return (
     <Draggable
       key={task.id}
@@ -109,6 +121,7 @@ const VirtualTaskWidget = ({task, completeTask, editTask}) => {
             task={task}
             editTask={editTask}
             completeTask={completeTask}
+            isWidget={true}
           />
           {/* <Center>
             <IconButton
@@ -155,15 +168,16 @@ export const VirtualTouchBar = ({timer, firstTask, editTask, completeTask, provi
     >
       <Flex
         className="innerVirtualTouchBar"
+        alignItems="center"
         gap="5px"
         width="max"
         overflowX="scroll"
         overflowY="hidden"
         paddingRight="10px"
       >
-        <VirtualTimerWidget
+        {/* <VirtualTimerWidget
           timer={timer}
-        />
+        /> */}
         {
           firstTask
           ? <VirtualTaskWidget

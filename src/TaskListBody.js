@@ -6,17 +6,19 @@ import {
 import { VirtualTouchBar } from './VirtualTouchBar.js';
 import { TaskList } from './TaskList.js';
 import { DragDropContext, Droppable } from "@hello-pangea/dnd";
-import { useEffect, useState } from "react";
-import { changeTaskWidgetText, getBTTVariable, playSound, setBTTVariable } from "./apiService.js";
+import { useEffect, useRef, useState } from "react";
+import { getBTTVariable, playSound, setBTTVariable } from "./apiService.js";
+import { changeTaskWidgetText } from "./taskService.js";
 
 const testTasks = require('./testTasks.json');
 
-window.addEventListener('bttVarChanged', (event) => {
-});
 
 export const TaskListBody = ({initialTimer, initialTasks}) => {
   const [tasks, setTasks] = useState(initialTasks);
-  const [removedTask, setRemovedTask]= useState({});
+  const tasksRef = useRef();
+  tasksRef.current = tasks;
+  const [removedTask, setRemovedTask] = useState({});
+
 
   const onDragEnd = result => {
     if (result.destination === null)
@@ -33,29 +35,23 @@ export const TaskListBody = ({initialTimer, initialTasks}) => {
     setTasks(newTasks);
   };
 
-  const handleEmptyState = async () => {
-    if (tasks.length > 0)
-      return;
-    
-    // const touchBarEnabled = await getBTTVariable('touchBarEnabled');
-    const ghostTask = {
-      content: 'All tasks completed!',
-      id: -999,
-      isGhost: true
-    }
-    setTasks([ghostTask]);
-  }
-
-  const completeTask = (completedTask) => {
+  const completeTask = (completedTask, isWidgetTask) => {
+    if (completedTask === undefined)
+      completedTask = tasksRef.current[0];
     getBTTVariable('taskCompleteSound')
       .then(result => playSound(result));
-    setTasks(tasks.map(task => {
+    setTasks(tasksRef.current.map(task => {
       return task.id === completedTask.id
         ? {...completedTask, isCompleted: true}
         : task
       }
     ));
+    console.log(completedTask, isWidgetTask);
+    if (isWidgetTask) {
+      changeTaskWidgetText(completedTask.content, true)
+    }
     setTimeout(() => {
+      console.log('marking task for deletion', completedTask)
       setRemovedTask(completedTask)
     }, 2250);
   };
@@ -66,7 +62,7 @@ export const TaskListBody = ({initialTimer, initialTasks}) => {
       id: Math.trunc(Math.random() * (10 ** 10)),
       startEditing: true
     }
-    setTasks(tasks.concat(newTask));
+    setTasks(tasksRef.current.concat(newTask));
   }
 
   const editTask = (editTask, newContent) => {
@@ -80,22 +76,56 @@ export const TaskListBody = ({initialTimer, initialTasks}) => {
         : task
     ));
   };
-
+  
   useEffect(() => {
-    changeTaskWidgetText(tasks[0]?.content);
-    setBTTVariable('cachedTasks', tasks);
-    return;
+    if (tasks.length === 0) {
+      const ghostTask = {
+        content: '',
+        id: -999,
+        isGhost: true
+      }
+      setTasks([ghostTask]);
+      changeTaskWidgetText('');
+      return;
+    }
+    else if (tasks.length > 1 && tasks[0].isGhost && tasks[1].content) {
+      setTasks(tasks.filter((task, index) => index !== 0))
+    }
+    getBTTVariable('cachedTasks')
+    .then(cachedTasks => {
+      if (cachedTasks[0].id !== tasks[0].id)
+        changeTaskWidgetText(tasks[0].content);
+    })
+    .then(() => setBTTVariable('cachedTasks', tasks));
   }, [tasks]);
 
   useEffect(() => {
+    console.log('removing task', removedTask)
     const newTasks = tasks.filter(task => task.id !== removedTask.id
       && task.content !== '');
-    if (newTasks.length === 0) 
-      handleEmptyState();
-    else
-      setTasks(newTasks);
+    setTasks(newTasks);
     return;
   }, [removedTask])
+
+  useEffect(() => {
+    let isEventHandled = false;
+    const taskWidgetEventHandler = async event => {
+      if (!(event.detail.name === 'TBT_taskWidgetTapped'))
+        return;
+      console.log('firing taskWidgetEventHandler');
+      if (!isEventHandled) {
+        isEventHandled = true;
+        completeTask(undefined, true);
+      }
+      setTimeout(() => {
+        isEventHandled = false
+      }, 50);
+    };
+    window.addEventListener('bttVarChanged', taskWidgetEventHandler);
+    return () => {
+      window.removeEventListener('bttVarChanged', taskWidgetEventHandler);
+    }
+  }, [])
 
   return (
   <DragDropContext
@@ -128,9 +158,9 @@ export const TaskListBody = ({initialTimer, initialTasks}) => {
         {(provided) =>
           <TaskList
             tasks={tasks}
+            addTask={addTask}
             editTask={editTask}
             completeTask={completeTask}
-            addTask={addTask}
             provided={provided}
           />
         }

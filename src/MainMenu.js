@@ -15,13 +15,28 @@ import {
   MdOutlineRefresh,
   MdOutlineDarkMode,
   MdOutlineSettings,
+  MdOutlineVolumeUp,
   MdOutlineVolumeOff,
   MdOutlineExitToApp
 } from 'react-icons/md';
 import { SettingsModal } from './SettingsModal.js'
+import { useEffect, useState } from 'react';
+import { getBTTVariable, setBTTVariable } from './apiService.js';
 
 export const MainMenu = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const [muted, setMuted] = useState(false);
+  
+  useEffect(() => {
+    getBTTVariable('appIsMuted')
+      .then(isMuted => setMuted(isMuted));
+  }, [])
+
+  const handleMute = () => {
+    setBTTVariable('appIsMuted', !muted);
+    setMuted(!muted);
+  };
+  
   return (<>
     <Menu>
     <MenuButton 
@@ -39,10 +54,16 @@ export const MainMenu = () => {
       >
         Refresh
       </MenuItem>
-      <MenuItem icon={<MdOutlineVolumeOff/>}
-      
+      <MenuItem icon={muted
+        ? <MdOutlineVolumeUp/>
+        : <MdOutlineVolumeOff/>
+      }
+        onClick={handleMute}
       >
-        Mute all sounds
+        {muted
+          ? "Unmute all sounds"
+          : "Mute all sounds"
+        }
       </MenuItem>
       <MenuItem icon={<MdOutlineDarkMode/>}
       

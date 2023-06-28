@@ -1,9 +1,18 @@
 /* eslint-disable no-restricted-globals */
+let interval = null;
 
 self.onmessage = (e) => {
-  let count = e.data;
-  setInterval(() => {
-    count--;
-    postMessage(count);
-  }, 1000);
+  console.log('Worker received message', e.data);
+  if (e.data) {
+    if (interval === null) {
+      interval = setInterval(() => {
+        console.log('Tick from timerWorker');
+        postMessage(true);
+      }, 1000)
+    }
+  }
+  else {
+    clearInterval(interval);
+    interval = null;
+  }
 }

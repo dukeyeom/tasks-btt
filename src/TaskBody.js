@@ -15,26 +15,20 @@ import {
   MdOutlineRadioButtonChecked,
   MdOutlineRadioButtonUnchecked
 } from "react-icons/md";
-import { Draggable } from '@hello-pangea/dnd';
 import { useState, useEffect } from 'react';
-import { createRipples } from 'react-ripples';
 import './App.css';
 
-export const TaskBody = ({task, editTask, completeTask, isWidget}) => {
+export const TaskBody = ({task, addTask, editTask, completeTask, isWidget}) => {
   const [content, setContent] = useState(task.content);
-
+  
   const startAsEditable = task.startEditing;
   useEffect(() => {
     delete task.startEditing;
   }, [])
 
-  useEffect(() => {
-    if (content !== '')
-      editTask(task, content);
-  }, [content]);
-
   const [editFieldOpen, setEditFieldOpen] = useState();
   const EditableControl = () => {
+    const editColor = isWidget ? "white" : "gray";
     let {isEditing, getEditButtonProps} = useEditableControls();
     useEffect(() => {
       setEditFieldOpen(isEditing);
@@ -42,7 +36,9 @@ export const TaskBody = ({task, editTask, completeTask, isWidget}) => {
     return editFieldOpen
       ? null
       : <IconButton
-        icon={<MdOutlineEdit />}
+        icon={<MdOutlineEdit
+          color={editColor}
+        />}
         size="sm"
         variant="ghost"
         position="absolute"
@@ -60,6 +56,10 @@ export const TaskBody = ({task, editTask, completeTask, isWidget}) => {
       ? null
       : <IconButton
         onClick={() => completeTask(task)}
+        color={isWidget
+          ? "white"
+          : "gray"
+        }
         borderRadius="15px"
         variant="ghost"
         size="xs"
@@ -67,11 +67,9 @@ export const TaskBody = ({task, editTask, completeTask, isWidget}) => {
           task.isCompleted
           ? <MdOutlineRadioButtonChecked
               fontSize="21px"
-              color="gray"
             />
           : <MdOutlineRadioButtonUnchecked
               fontSize="21px"
-              color="gray"
             />
         }
       />
@@ -91,7 +89,12 @@ export const TaskBody = ({task, editTask, completeTask, isWidget}) => {
         startWithEditView={startAsEditable}
         value={content}
         onChange={nextValue => setContent(nextValue)}
-        onSubmit={value => editTask(task, value)}
+        onSubmit={value => {
+          editTask(task, value);
+          if (value !== '' && !isWidget) // && startAsEditable)
+            setTimeout(() => addTask(), 10);
+        }}
+        onCancel={value => editTask(task, value)}
         display="flex"
         alignItems="center"
       >
