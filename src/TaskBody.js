@@ -17,6 +17,7 @@ import {
 } from "react-icons/md";
 import { useState, useEffect } from 'react';
 import './App.css';
+import { changeTaskWidgetText } from './taskService';
 
 export const TaskBody = ({task, addTask, editTask, completeTask, isWidget}) => {
   const [content, setContent] = useState(task.content);
@@ -55,7 +56,12 @@ export const TaskBody = ({task, addTask, editTask, completeTask, isWidget}) => {
       editFieldOpen
       ? null
       : <IconButton
-        onClick={() => completeTask(task)}
+        onClick={() => {
+          completeTask(task);
+          setTimeout(() =>
+            changeTaskWidgetText(task.content, true),
+          10)         
+        }}
         color={isWidget
           ? "white"
           : "gray"
@@ -80,7 +86,7 @@ export const TaskBody = ({task, addTask, editTask, completeTask, isWidget}) => {
           padding="4px 0 4px 0"
           className='taskFadeout'
         >
-          <strike>{task.content}</strike>
+          {task.content}
         </Text>
       : <Editable
         defaultValue={

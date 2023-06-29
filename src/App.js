@@ -24,9 +24,11 @@ script.innerHTML = `
     window.dispatchEvent(new CustomEvent('windowRevealed'));
   }
   function BTTWillCloseWindow() {
+    console.log('closing window');
     window.dispatchEvent(new CustomEvent('windowClosed'));
   }
   function BTTWillHideWindow() {
+    console.log('hiding window');
     window.dispatchEvent(new CustomEvent('windowHidden'));
   }
   async function BTTNotification(note) {
@@ -56,15 +58,15 @@ const theme = extendTheme({
 
 await restartTimer(timer);
 
-const windowRevealedHandler = async () => {
-  console.log('firing windowRevealedHandler');
-  const timer = await getBTTVariable('timer');
-  restartTimer(timer);
-  const currentDay = new Date().getDate();
-  if (currentDay !== timer.currentDay)
-    timer.count = 0;
-};
-window.addEventListener('windowRevealed', windowRevealedHandler);
+// const windowRevealedHandler = async () => {
+//   console.log('firing windowRevealedHandler');
+//   const timer = await getBTTVariable('timer');
+//   restartTimer(timer);
+//   const currentDay = new Date().getDate();
+//   if (currentDay !== timer.currentDay)
+//     timer.count = 0;
+// };
+// window.addEventListener('windowRevealed', windowRevealedHandler);
 
 const App = () => {
   return (

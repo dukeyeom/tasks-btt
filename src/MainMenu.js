@@ -77,7 +77,9 @@ export const MainMenu = () => {
       </MenuItem>
       <MenuDivider />
       <MenuItem icon={<MdOutlineExitToApp/>}
-        onClick={() => onOpen()}
+        onClick={() => 
+          window.close()
+        }
       >
         Exit
       </MenuItem>

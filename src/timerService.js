@@ -31,7 +31,7 @@ const iconNames = {
   ],
 };
 
-const timerTick = new Worker();
+export const timerTick = new Worker();
 timerTick.onmessage = (e) => {
   getBTTVariable('timer')
   .then(timer => incrementTimer(timer));

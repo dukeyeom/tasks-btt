@@ -1,4 +1,4 @@
-import { Center, Flex, IconButton, Spacer, Text } from "@chakra-ui/react";
+import { Center, Flex, IconButton, Image, Spacer, Text } from "@chakra-ui/react";
 import { Draggable } from "@hello-pangea/dnd";
 import {
   MdOutlineTimer,
@@ -10,16 +10,22 @@ import { TaskBody } from './TaskBody';
 import { timerService } from './timerService.js';
 import { getBTTVariable } from "./apiService";
 import { useEffect, useRef, useState } from "react";
+import { timerTick } from "./timerService";
+import icons from './icons.json';
 
+const IconImage = ({src}) => {
+  return <img src={src} />
+}
 
 const VirtualTimerWidget = ({timer}) => {
+  const iconRef = useRef('');
   const timerRef = useRef(null);
   const handleMouseDown = () => {
     timerRef.current = setTimeout(() => {
       console.log('Click and hold event triggered');
-      setHandleClick(null);
+      handleClick.current = null;
       setTimeout(() => {
-        setHandleClick(() => timerService.handleTimerTapped);
+        handleClick.current = () => timerService.handleTimerTapped;
       }, 1000)
       timerService.handleTimerHeld();
     }, 1500); // Adjust the duration for how long the click needs to be held
@@ -29,25 +35,34 @@ const VirtualTimerWidget = ({timer}) => {
   }
 
   const [timerObj, setTimerObj] = useState(timer);
-  const [handleClick, setHandleClick] = useState(() => timerService.handleTimerTapped);
-  // const timerChangeHandler = (event) => {
-  //   if (event.detail.name === 'TBT_timer') {
-  //     getBTTVariable('timer')
-  //       .then(result => setTimerObj(result))
-  //   }
-  // }
-  // useEffect(() => {
-  //   window.addEventListener('bttVarChanged', timerChangeHandler);
-  //   return () => {
-  //     window.removeEventListener('bttVarChanged', timerChangeHandler)
-  //   }
-  // }, [])
+  const handleClick = useRef(() => timerService.handleTimerTapped);
+
+  const updateTimerWidget = () => {
+    if (document.visibilityState === 'hidden')
+      return;
+    getBTTVariable('timer')
+      .then(result => setTimerObj(result))
+  }
+
+  useEffect(() => {
+    getBTTVariable('path')
+      .then(path => iconRef.current = `${path}icons/`);
+    // timerTick.addEventListener('message', updateTimerWidget);
+    window.addEventListener('bttVarChanged', updateTimerWidget);
+    document.addEventListener('visibilityChange', updateTimerWidget);
+    return () => {
+      // timerTick.removeEventListener('message', updateTimerWidget);
+      window.addEventListener('bttVarChanged', updateTimerWidget);
+      document.addEventListener('visibilityChange', updateTimerWidget);
+    }
+  }, [])
 
   return (
     <Flex
-      onClick={handleClick}
-      onMouseDown={handleMouseDown}
-      onMouseUp={handleMouseUp}
+      // onClick={handleClick.current}
+      // onMouseDown={handleMouseDown}
+      // onMouseUp={handleMouseUp}
+      cursor="default"
       alignItems="center"
       backgroundColor={timerObj.onWorkInterval ? "red" : "dodgerblue"}
       height="30px"
@@ -56,14 +71,18 @@ const VirtualTimerWidget = ({timer}) => {
       color="white"
       fontSize="16px"
       fontWeight="600"
-      cursor="pointer"
+      style={{
+        fontVariantNumeric: "tabular-nums lining-nums"
+      }}
     >
-      <Center fontSize="23px">
-        {
-          timerObj.isPaused
-            ? <MdOutlinePause/>
-            : <MdOutlineTimer/>
-        }
+      <Center
+        fontSize="23px">
+      
+      <Image
+        minWidth="23px"
+        maxWidth="23px"
+        filter="invert(1)"
+        src={`data:image/png;base64,${icons[timerObj.icon]}`} />
       </Center>
       <Spacer
         width="5px"
@@ -175,9 +194,9 @@ export const VirtualTouchBar = ({timer, firstTask, editTask, completeTask, provi
         overflowY="hidden"
         paddingRight="10px"
       >
-        {/* <VirtualTimerWidget
+        <VirtualTimerWidget
           timer={timer}
-        /> */}
+        />
         {
           firstTask
           ? <VirtualTaskWidget
