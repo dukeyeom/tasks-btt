@@ -65,9 +65,6 @@ export const refreshTouchBar = () => {
 
 };
 
-
-
-
 export const changeTimerVariable = async (key, newValue) => {
   const oldTimer = await getBTTVariable('timer');
   const newTimer = {

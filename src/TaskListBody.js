@@ -38,8 +38,9 @@ export const TaskListBody = ({initialTimer, initialTasks}) => {
   const completeTask = (completedTask, isWidgetTask) => {
     if (completedTask === undefined)
       completedTask = tasksRef.current[0];
-    getBTTVariable('taskCompleteSound')
-      .then(result => playSound(result));
+    if (!completedTask.isCompleted)
+      getBTTVariable('taskCompleteSound')
+        .then(result => playSound(result));
     setTasks(tasksRef.current.map(task => {
       return task.id === completedTask.id
         ? {...completedTask, isCompleted: true}

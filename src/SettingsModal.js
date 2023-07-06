@@ -71,6 +71,28 @@ const SoundSelect = ({type}) => {
   </Select>;
 }
 
+const FormatSelect = () => {
+  const [selection, setSelection] = useState(null);
+  useEffect(() => {
+    getBTTVariable('timer')
+      .then(timer => setSelection(timer.format))
+  }, []);
+  return <>
+    <Heading size="xs">Time display</Heading>
+    <Select
+      value={selection}
+      onChange={event => {
+        changeTimerVariable(`format`, event.target.value)
+        setSelection(event.target.value);
+      }}
+    >
+      <option>mm:ss</option>
+      <option>mm min</option>
+      <option>Progress bar</option>
+    </Select>
+  </>
+};
+
 export const SettingsModal = ({isOpen, onClose}) => {
   return (
     <>
@@ -128,13 +150,7 @@ export const SettingsModal = ({isOpen, onClose}) => {
                 &nbsp;
                 <Checkbox />
               </HStack>
-              <Heading size="xs">Time display</Heading>
-              <Select>
-                <option value="">mm:ss</option>
-                <option value="">mm min</option>
-                <option value="">mm</option>
-                <option value="">Progress bar</option>
-              </Select>
+              <FormatSelect />
               <Heading size="xs">Change Pomodaro count emoji</Heading>
               <Heading size="xs">Day starts at</Heading>
               <Heading size="xs">Timer start sound</Heading>

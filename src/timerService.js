@@ -45,14 +45,25 @@ const stopTimer = () => {
 }
 
 const getTimerText = timer => {
+  if (timer.format === 'Progress bar') {
+    const intervalLength = Number(timer.onWorkInterval ? timer.workLength : timer.restLength) * 60;
+    const blink = timer.secsRemaining % 2 === 0 ? 0 : 1;
+    const progress = Math.floor((timer.secsRemaining / intervalLength) * 8) + blink ?? 0;
+    console.log(progress);
+    return '▮'.repeat(8 - progress) + '▯'.repeat(progress);
+      return '▮▮▮▮▯▯▯▯▯▯';
+  }
+
   if (timer.format === 'mm min')
-    return String(Math.ceil(timer.secsRemaining / 60)) + "min";
+    return String(Math.ceil(timer.secsRemaining / 60)) + " min";
   if (timer.format === 'mm:ss')
     return String(Math.floor(timer.secsRemaining / 60)) + ":" + String(timer.secsRemaining % 60).padStart(2, '0');
 }
 // KNOWN ISSUE
 // Time spent paused will be counted as if it not paused when timer is restarted due to reboot
 export const restartTimer = async timer => {
+  if (!timer.isStarted)
+    return;
   const intervalLength = Number(timer.onWorkInterval ? timer.workLength : timer.restLength) * 60;
   let timeElapsed = timer.secsRemaining;
   if (timer.isStarted && !timer.isPaused)
@@ -146,7 +157,6 @@ const updateTimerWidget = async (timer, event) => {
 
 const completeInterval = timer => {
   stopTimer();
-  console.log(`workLength: ${timer.workLength}, restLength: ${timer.restLength}`);
   const sound = timer.onWorkInterval
     ? timer.workSound
     : timer.restSound;

@@ -62,10 +62,7 @@ export const TaskBody = ({task, addTask, editTask, completeTask, isWidget}) => {
             changeTaskWidgetText(task.content, true),
           10)         
         }}
-        color={isWidget
-          ? "white"
-          : "gray"
-        }
+        color={isWidget ? "white" : "gray"}
         borderRadius="15px"
         variant="ghost"
         size="xs"
@@ -85,34 +82,38 @@ export const TaskBody = ({task, addTask, editTask, completeTask, isWidget}) => {
       ? <Text
           padding="4px 0 4px 0"
           className='taskFadeout'
+          color={isWidget ? "white" : "gray"}
+          cursor=""
         >
           {task.content}
         </Text>
       : <Editable
-        defaultValue={
-          task.content
-        }
-        startWithEditView={startAsEditable}
-        value={content}
-        onChange={nextValue => setContent(nextValue)}
-        onSubmit={value => {
-          editTask(task, value);
-          if (value !== '' && !isWidget) // && startAsEditable)
-            setTimeout(() => addTask(), 10);
-        }}
-        onCancel={value => editTask(task, value)}
-        display="flex"
-        alignItems="center"
-      >
+          defaultValue={
+            task.content
+          }
+          startWithEditView={startAsEditable}
+          value={content}
+          onChange={nextValue => setContent(nextValue)}
+          onSubmit={value => {
+            editTask(task, value);
+            if (value !== '' && !isWidget) // && startAsEditable)
+              setTimeout(() => addTask(), 10);
+          }}
+          onCancel={value => editTask(task, value)}
+          display="flex"
+          alignItems="center"
+        >
         <EditablePreview
           cursor="grab"
         />
         <Input
           as={EditableInput}
+          wordWrap="break-word"
+          wordBreak="break-all"
           autoFocus
           flexWrap="none"
           height="max"
-          width="278px"
+          minWidth="278px"
         />
         <EditableControl />
       </Editable>
