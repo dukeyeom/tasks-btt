@@ -1,21 +1,10 @@
-import { Center, Flex, IconButton, Image, Spacer, Text } from "@chakra-ui/react";
+import { Center, Flex, Image, Spacer, Text } from "@chakra-ui/react";
 import { Draggable } from "@hello-pangea/dnd";
-import {
-  MdOutlineTimer,
-  MdOutlinePause,
-  MdOutlineRadioButtonChecked,
-  MdOutlineRadioButtonUnchecked,
-} from "react-icons/md";
 import { TaskBody } from './TaskBody';
 import { timerService } from './timerService.js';
 import { getBTTVariable } from "./apiService";
 import { useEffect, useRef, useState } from "react";
-import { timerTick } from "./timerService";
 import icons from './icons.json';
-
-const IconImage = ({src}) => {
-  return <img src={src} />
-}
 
 const VirtualTimerWidget = ({timer}) => {
   const iconRef = useRef('');
